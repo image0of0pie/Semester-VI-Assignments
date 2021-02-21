@@ -2,10 +2,9 @@ import java.io.BufferedInputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.net.Socket;
-
 class ClientHandler implements Runnable{
     private final Socket socket;
-    private final DataBase db;
+    public DataBase db;
     private DataInputStream input;
     private DataOutputStream out;
     private String username=null;
@@ -41,6 +40,9 @@ class ClientHandler implements Runnable{
             try
             {
                 line = input.readUTF();
+                if(line.charAt(0)=='\n'){
+                    line=line.substring(1);
+                }
                 String[] tokens=line.split(" ");
                 if(tokens[0].equalsIgnoreCase("Over")){
                     out.writeUTF("Session Terminated");

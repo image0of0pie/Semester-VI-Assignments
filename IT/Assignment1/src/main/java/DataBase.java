@@ -1,7 +1,8 @@
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
-public class DataBase {
+public class DataBase implements Serializable {
     HashMap<String,HashMap<String,String>> store;
     HashMap<String, Integer> register;
     int numOfManagers;
@@ -15,10 +16,13 @@ public class DataBase {
 
     public String getValue(String key,String name) {
         if(this.isManager(name)){
-            String result="";
+            String result=null;
             for (Map.Entry<String, HashMap<String,String>> e : this.store.entrySet()){
                 if(e.getValue().containsKey(key)){
-                    result=result+" , "+e.getValue().get(key);
+                    if(result.equals(null))
+                        result=e.getValue().get(key);
+                    else
+                        result=result+" , "+e.getValue().get(key);
                 }
             }
             if(result.equals("")){
