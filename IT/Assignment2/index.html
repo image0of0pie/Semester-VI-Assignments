@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Chat App</title>
+  <script defer src="http://localhost:3000/socket.io/socket.io.js"></script>
+  <script defer src="script.js"></script>
+  <style>
+    body {
+      padding: 0;
+      margin: 0;
+      display: flex;
+      justify-content: center;
+    }
+    /* Chat containers */
+    .container {
+      border: 1px solid #dedede;
+      background-color: #ffffff;
+      border-radius: 5px;
+      padding: 1px;
+      margin: 10px 0;
+    }
+
+    /* Clear floats */
+    .container::after {
+      content: "";
+      clear: both;
+      display: table;
+    }
+
+    /* Style images */
+    .container img {
+      float: left;
+      max-width: 100px;
+      width: 100%;
+      margin-right: 20px;
+      border-radius: 50%;
+    }
+
+    /* Style time text */
+    .time-right {
+      float: right;
+      color: #aaa;
+    }
+
+    
+    #message-container {
+      width: 80%;
+      max-width: 1200px;
+    }
+
+    #message-container div {
+      background-color: rgb(243, 235, 235);
+      padding: 5px;
+    }
+
+
+    #send-container {
+      position: fixed;
+      padding-bottom: 30px;
+      bottom: 0;
+      background-color: white;
+      max-width: 1200px;
+      width: 80%;
+      display: flex;
+    }
+    #image-input {
+      flex-grow: 1;
+    }
+    #image-label{
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <div id="message-container"></div>
+  <form id="send-container">
+    <p><input type="text" id="message-input"></p>
+    <p><input type="file"  accept="image/*" name="image" id="file" onchange="loadFile(event)" style="display: none;"></p>
+    <p><label id="image-label" for="file">Upload Image</label></p>
+    <p><img id="output" for="file" width="50" /></p>
+    <button type="submit" id="send-button">Send</button>
+  </form>
+</body>
+</html>
