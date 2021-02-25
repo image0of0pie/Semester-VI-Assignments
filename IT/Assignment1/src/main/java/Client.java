@@ -37,6 +37,7 @@ public class Client {
         // keep reading until "Over" is input
         while (true)
         {
+            System.out.print(userName+"$ ");
             line = userInput.nextLine();
             try
             {

@@ -48,6 +48,29 @@ class ClientHandler implements Runnable{
                     out.writeUTF("Session Terminated");
                     break;
                 }
+/*
+                // as per mentioned in the assignment
+                for(int idx=0;idx<tokens.length;idx++){
+                    if(tokens[idx].equalsIgnoreCase("get")){
+                        String key=tokens[idx+1];
+                        idx+=1;
+                        // get handler
+                    }else if(tokens[idx].equalsIgnoreCase("put")){
+                        String key=tokens[idx+1],value=tokens[idx+2];
+                        idx+=2;
+                        // put handler
+                    }else if(tokens[idx].equalsIgnoreCase("upgrade")){
+                        String password=tokens[idx+1];
+                        idx+=1;
+                        //upgrade handler
+                    }else if(tokens[idx].equalsIgnoreCase("over")){
+                        // exit handler
+                    }else{
+                        // respond with invalid info
+                    }
+                }
+*/
+                // my own implementation excluding the flaws of erroneous input from user
                 switch (tokens[0]) {
                     case "get" -> {
                         if (tokens.length < 2) {

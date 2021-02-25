@@ -1,0 +1,33 @@
+{
+  "name": "socketchat",
+  "version": "1.0.0",
+  "description": "A simple, real-time messaging application",
+  "main": "index.js",
+  "scripts": {
+    "build": "node ./node_modules/gulp/bin/gulp",
+    "start": "SESSIONSECRET=$SOCKETCHATSECRET node index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/abdullah-k/socketChat.git"
+  },
+  "author": "Abdullah Khan",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/abdullah-k/socketChat/issues"
+  },
+  "homepage": "https://github.com/abdullah-k/socketChat#readme",
+  "dependencies": {
+    "body-parser": "^1.19.0",
+    "compression": "^1.7.4",
+    "express": "^4.17.1",
+    "express-session": "^1.17.0",
+    "pug": "^2.0.4",
+    "socket.io": "^2.4.1"
+  },
+  "devDependencies": {
+    "gulp": "^4.0.2",
+    "gulp-autoprefixer": "^7.0.1",
+    "gulp-sass": "^4.0.2"
+  }
+}

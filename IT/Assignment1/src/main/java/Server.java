@@ -9,22 +9,25 @@ public class Server {
     private ServerSocket serverSocket;
     private ExecutorService pool;
     public DataBase db;
-    public Server(int port) {
-        try {
-            File file=new File("db.ser");
-            if(file.exists()) {
-                System.out.println("Loading saved database");
-                FileInputStream fileIn = new FileInputStream(file);
-                ObjectInputStream in = new ObjectInputStream(fileIn);
-                this.db = (DataBase) in.readObject();
-                in.close();
-                fileIn.close();
-            }} catch (Exception e) {
-            System.err.println(e.toString());
+    public Server(int port,int prevDb) {
+        if(prevDb==1) {
+            try {
+                File file = new File("db.ser");
+                if (file.exists()) {
+                    System.out.println("Loading saved database");
+                    FileInputStream fileIn = new FileInputStream(file);
+                    ObjectInputStream in = new ObjectInputStream(fileIn);
+                    this.db = (DataBase) in.readObject();
+                    in.close();
+                    fileIn.close();
+                }
+            } catch (Exception e) {
+                System.err.println(e.toString());
+            }
         }
-        if(this.db==null){
+        if (this.db == null) {
             System.out.println("Initializing new database");
-            this.db=new DataBase(10);
+            this.db = new DataBase(10);
         }
         String hostIp="127.0.0.1";
         try {
@@ -75,7 +78,10 @@ public class Server {
 
 
     public static void main(String[] args) {
-        new Server(5000);
+        if(args[0].equalsIgnoreCase("new"))
+            new Server(5000,0);
+        else
+            new Server(5000,1);
     }
 }
 

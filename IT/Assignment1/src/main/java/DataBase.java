@@ -16,13 +16,13 @@ public class DataBase implements Serializable {
 
     public String getValue(String key,String name) {
         if(this.isManager(name)){
-            String result=null;
+            String result="";
             for (Map.Entry<String, HashMap<String,String>> e : this.store.entrySet()){
                 if(e.getValue().containsKey(key)){
-                    if(result.equals(null))
+                    if(result.equals(""))
                         result=e.getValue().get(key);
                     else
-                        result=result+" , "+e.getValue().get(key);
+                        result=result+" , "+e.getKey()+" : "+e.getValue().get(key);
                 }
             }
             if(result.equals("")){
@@ -44,9 +44,11 @@ public class DataBase implements Serializable {
         String msg="Logged in as guest -- "+name;
         if(this.register.containsKey(name) && this.isManager(name)){
             msg="Logged in as manager -- " +name;
-        }else if(!this.register.containsKey(name)) {
+        }
+        else if(!this.register.containsKey(name)) {
             this.register.put(name, 2);
             this.store.put(name,new HashMap<>());
+            msg="Registration successful -- "+name;
         }
         return msg;
     }
