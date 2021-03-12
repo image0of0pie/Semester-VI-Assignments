@@ -5,20 +5,28 @@ io.on("connection", (socket) => {
   socket.on("new-user", ({ name, password }) => {
     if (name in authStore) {
       if (authStore[name] === password) {
-        io.emit("connection-status", { name, status: true });
+        socket.emit("connection-status", {
+          status: true,
+          message: "Testing Srestha's code style",
+        });
         socket.broadcast.emit("user-connected", name);
         const messagesPrevious = messageStore[name];
-        console.log(messagesPrevious);
         socket.join(name);
         io.emit("users-list", Object.keys(authStore));
         io.to(name).emit("prev-chat-message", messagesPrevious);
       } else {
-        io.emit("connection-status", { name, status: false });
+        socket.emit("connection-status", {
+          status: false,
+          message: "Testing Srestha's code style",
+        });
       }
     } else {
       authStore[name] = password;
       messageStore[name] = [];
-      io.emit("connection-status", { name: name, status: true });
+      socket.emit("connection-status", {
+        status: true,
+        message: "Testing Srestha's code style",
+      });
       socket.broadcast.emit("user-connected", name);
       socket.join(name);
       io.emit("users-list", Object.keys(authStore));

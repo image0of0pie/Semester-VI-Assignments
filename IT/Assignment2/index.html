@@ -488,7 +488,8 @@ function handleJoin() {
   socket.emit("new-user", { name: selfUserName, password });
 }
 socket.on("connection-status", (data) => {
-  if ((selfUserName === data.name) & (data.status === true)) {
+  console.log(data);
+  if (data.status === true) {
     document.getElementById("username").innerText = selfUserName;
     document.getElementById("loginPage").style.display = "none";
     document.getElementById("chatPage").style.display = "block";
