@@ -4,7 +4,6 @@ import AppBar from "@material-ui/core/AppBar";
 import Toolbar from "@material-ui/core/Toolbar";
 import Typography from "@material-ui/core/Typography";
 import StoreIcon from "@material-ui/icons/Store";
-import Carousal from "./Carousal";
 import Grid from "@material-ui/core/Grid";
 import Paper from "@material-ui/core/Paper";
 import Button from "@material-ui/core/Button";
@@ -13,7 +12,7 @@ import InputLabel from "@material-ui/core/InputLabel";
 import MenuItem from "@material-ui/core/MenuItem";
 import FormControl from "@material-ui/core/FormControl";
 import Select from "@material-ui/core/Select";
-import CityList from "./CityList";
+import Carousal from "./Carousal";
 const useStyles = makeStyles((theme) => ({
   formControl: {
     margin: theme.spacing(1),
@@ -44,7 +43,7 @@ const useStyles = makeStyles((theme) => ({
 function loadServerRows(page, data) {
   return new Promise((resolve) => {
     setTimeout(() => {
-      resolve(data.slice(page * 5, (page + 1) * 5));
+      resolve(data.slice(page * 10, (page + 1) * 10));
     }, Math.random() * 500 + 100); // simulate network latency
   });
 }
@@ -65,34 +64,38 @@ export default function DenseAppBar() {
   const [data, setData] = React.useState([]);
   const columns = [
     { field: "id", hide: true, headerName: "ID" },
-    { field: "time", width: 110, headerName: "Time" },
-    { field: "arrivalCity", width: 150, headerName: "Arrival City" },
-    { field: "departureCity", width: 150, headerName: "Departure City" },
+    { field: "time", width: 90, headerName: "Time" },
+    { field: "arrivalCity", width: 210, headerName: "Arrival City/Airport" },
+    {
+      field: "departureCity",
+      width: 210,
+      headerName: "Departure City/Airport",
+    },
     { field: "legs", width: 90, headerName: "Legs" },
-    { field: "cost", width: 120, headerName: "Total Cost" },
-    { field: "duration", width: 110, headerName: "Duration" },
+    { field: "cost", width: 150, headerName: "Total Cost (in ₹)" },
+    { field: "duration", width: 150, headerName: "Duration(mins)" },
   ];
   const timeList = [
-    "00:00",
-    "00:30",
-    "01:00",
-    "01:30",
-    "02:00",
-    "02:30",
-    "03:00",
-    "03:30",
-    "04:00",
-    "04:30",
-    "05:00",
-    "05:30",
-    "06:00",
-    "06:30",
-    "07:00",
-    "07:30",
-    "08:00",
-    "08:30",
-    "09:00",
-    "09:30",
+    "0:00",
+    "0:30",
+    "1:00",
+    "1:30",
+    "2:00",
+    "2:30",
+    "3:00",
+    "3:30",
+    "4:00",
+    "4:30",
+    "5:00",
+    "5:30",
+    "6:00",
+    "6:30",
+    "7:00",
+    "7:30",
+    "8:00",
+    "8:30",
+    "9:00",
+    "9:30",
     "10:00",
     "10:30",
     "11:00",
@@ -161,9 +164,13 @@ export default function DenseAppBar() {
       "http://localhost:8080/Assignment3_war/queryflight" +
       formatParams(params);
     (async () => {
-      fetch(url)
+      await fetch(url)
         .then((response) => response.json())
         .then((res) => {
+          res.sort(function (a, b) {
+            if (a.time > b.time) return 1;
+            else return -1;
+          });
           setData(res);
         })
         .catch((err) => console.log(err));
@@ -174,8 +181,9 @@ export default function DenseAppBar() {
       fetch("http://localhost:8080/Assignment3_war/info")
         .then((response) => response.json())
         .then((data) => {
+          console.log(data);
           data.sort(function (a, b) {
-            if (a.name.toLowerCase() > b.name.toLowerCase()) {
+            if (a.city > b.city) {
               return 1;
             } else {
               return -1;
@@ -185,12 +193,34 @@ export default function DenseAppBar() {
         })
         .catch((err) => console.log(err));
     })();
-  }, [cities]);
+  });
+  React.useEffect(() => {
+    const params = {
+      arrivalCity: searchArrivalCity,
+      departureCity: searchDepartureCity,
+      time: searchTime,
+    };
+    const url =
+      "http://localhost:8080/Assignment3_war/queryflight" +
+      formatParams(params);
+    (async () => {
+      await fetch(url)
+        .then((response) => response.json())
+        .then((res) => {
+          res.sort(function (a, b) {
+            if (a.time > b.time) return 1;
+            else return -1;
+          });
+          setData(res);
+        })
+        .catch((err) => console.log(err));
+    })();
+  });
   return (
     <div className={classes.root}>
-      <Grid container spacing={3}>
+      <Grid container>
         <Grid item xs={12}>
-          <AppBar position="static" color="secondary">
+          <AppBar position="static" color="primary">
             <Toolbar variant="dense">
               <StoreIcon color="inherit" fontSize="large" />
               <Typography variant="h5" color="inherit">
@@ -199,14 +229,9 @@ export default function DenseAppBar() {
             </Toolbar>
           </AppBar>
         </Grid>
-        <Grid item xs={3}>
-          <CityList cities={cities} />
-        </Grid>
-        <Grid item xs={7}>
+        <Grid item xs={12} sm={12} lg={8}>
           <Paper className={classes.paper}>
-            <Carousal />
-            <Grid item xs={12}></Grid>
-            <Grid item xs={12} style={{ marginTop: 70 }}>
+            <Grid item xs={12} style={{ marginTop: 10 }}>
               <FormControl className={classes.formControl}>
                 <InputLabel id="demo-simple-select-filled-label">
                   Departure City
@@ -220,10 +245,10 @@ export default function DenseAppBar() {
                   }
                 >
                   <MenuItem value="">
-                    <em>None</em>
+                    <em>All</em>
                   </MenuItem>
                   {cities.map((city) => (
-                    <MenuItem value={city.name}>{city.name}</MenuItem>
+                    <MenuItem value={city.city}>{city.city}</MenuItem>
                   ))}
                 </Select>
               </FormControl>
@@ -238,10 +263,10 @@ export default function DenseAppBar() {
                   onChange={(event) => setSearchArrivalCity(event.target.value)}
                 >
                   <MenuItem value="">
-                    <em>None</em>
+                    <em>All</em>
                   </MenuItem>
                   {cities.map((city) => (
-                    <MenuItem value={city.name}>{city.name}</MenuItem>
+                    <MenuItem value={city.city}>{city.city}</MenuItem>
                   ))}
                 </Select>
               </FormControl>
@@ -257,7 +282,7 @@ export default function DenseAppBar() {
                   onChange={(event) => setSearchTime(event.target.value)}
                 >
                   <MenuItem value="">
-                    <em>None</em>
+                    <em>All</em>
                   </MenuItem>
                   {timeList.map((time) => (
                     <MenuItem value={time}>{time}</MenuItem>
@@ -266,8 +291,8 @@ export default function DenseAppBar() {
               </FormControl>
               <Button
                 variant="contained"
-                size="medium"
-                color="secondary"
+                size="large"
+                color="primary"
                 className={classes.formControlButton}
                 onClick={() => handleSearchQuery()}
               >
@@ -275,13 +300,13 @@ export default function DenseAppBar() {
               </Button>
             </Grid>
             <Grid item xs={12}>
-              <Paper>
-                <div style={{ height: 400, width: "100%" }}>
+              <Paper style={{ marginTop: 20 }}>
+                <div style={{ height: 630, width: "100%" }}>
                   <DataGrid
                     rows={rows}
                     columns={columns}
                     pagination
-                    pageSize={5}
+                    pageSize={10}
                     rowCount={data.length}
                     paginationMode="server"
                     onPageChange={handlePageChange}
@@ -292,6 +317,9 @@ export default function DenseAppBar() {
             </Grid>
             <Grid item xs={2}></Grid>
           </Paper>
+        </Grid>
+        <Grid item xs={12} sm={12} lg={4}>
+          <Carousal />
         </Grid>
       </Grid>
     </div>

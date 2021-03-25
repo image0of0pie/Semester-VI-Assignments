@@ -1,4 +1,4 @@
-#include <bits/stdc++.h>
+#include <iostream>
 using namespace std;
 
 int im = 3, ic = 3, i, j, fm = 0, fc = 0, status = 0, flag = 0, select = 0;

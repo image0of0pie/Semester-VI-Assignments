@@ -3,30 +3,26 @@
  "http://java.sun.com/dtd/web-app_2_3.dtd" >
 
 <web-app>
-  <display-name>Archetype Created Web Application</display-name>
-  <servlet>
-    <servlet-name>QueryFlight</servlet-name>
-    <servlet-class>QueryFlight</servlet-class>
-  </servlet>
-  <servlet>
-    <servlet-name>Deals</servlet-name>
-    <servlet-class>Deals</servlet-class>
-  </servlet>
-  <servlet>
-    <servlet-name>Info</servlet-name>
-    <servlet-class>Info</servlet-class>
-  </servlet>
-  <servlet-mapping>
-    <servlet-name>QueryFlight</servlet-name>
-    <url-pattern>/queryflight</url-pattern>
-  </servlet-mapping>
-  <servlet-mapping>
-    <servlet-name>Deals</servlet-name>
-    <url-pattern>/deals</url-pattern>
-  </servlet-mapping>
-  <servlet-mapping>
-    <servlet-name>Info</servlet-name>
-    <url-pattern>/info</url-pattern>
-  </servlet-mapping>
+  <context-param>
+    <param-name>DB_URL</param-name>
+    <param-value>jdbc:mysql://localhost:3306</param-value>
+  </context-param>
+  <context-param>
+    <param-name>DRIVER_URL</param-name>
+    <param-value>com.mysql.jdbc.Driver</param-value>
+  </context-param>
+  <context-param>
+    <param-name>DB_NAME</param-name>
+    <param-value>Ticket</param-value>
+  </context-param>
+  <context-param>
+    <param-name>password</param-name>
+    <param-value>123456</param-value>
+  </context-param>
+  <context-param>
+    <param-name>username</param-name>
+    <param-value>root</param-value>
+  </context-param>
+  <display-name>Ticket Store backend</display-name>
 
 </web-app>
