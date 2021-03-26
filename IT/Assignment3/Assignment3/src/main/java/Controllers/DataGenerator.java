@@ -1,10 +1,10 @@
 package Util;
+import java.io.IOException;
 import java.sql.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-import com.mysql.jdbc.Driver;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.jsoup.Jsoup;
@@ -12,16 +12,42 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
-public class DataGenerator extends Driver {
-
-    public DataGenerator() throws SQLException {
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+@WebServlet(urlPatterns = "/setdata")
+public class DataGenerator extends HttpServlet {
+    public static Statement stat;
+    @Override
+    public void init() throws ServletException {
+        super.init();
+        try{
+            stat=(Statement) getServletContext().getAttribute("databaseStatement");
+        }catch (Exception e) {
+            System.err.println(e.toString());
+        }
+    }
+    @Override
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        super.doGet(req, resp);
+        ResetDatabase();
+        CityGenerator();
+        ScheduleGenerator();
+        DealGenerator();
+    }
+    public static void ResetDatabase(){
+        try{
+            stat.executeUpdate("delete from Deals ;");
+            stat.executeUpdate("delete from Schedule;");
+            stat.executeUpdate("delete from City;");
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
     }
     public static void CityGenerator(){
-        String DB_URL="jdbc:mysql://localhost:3306";
         try {
-            Connection conn= DriverManager.getConnection(DB_URL,"root","123456");
-            Statement stat = conn.createStatement();
-
             List<String> airportCities=new ArrayList<>();
             Document doc = Jsoup.connect("https://www.nationsonline.org/oneworld/IATA_Codes/airport_code_list.htm").get();
             Elements tableElements=doc.select("tr");
@@ -31,23 +57,17 @@ public class DataGenerator extends Driver {
                     airportCities.add(children.get(0).text()+" , "+children.get(1).text()+"("+children.get(2).text()+")");
                 }
             }
-            stat.executeQuery("USE Ticket");
             for(String city:airportCities){
                 if(!city.contains("'")) {
                     stat.executeUpdate("insert into City(city) values ('" + city + "');");
                 }
             }
-            conn.close();
         } catch (Exception e) {
             System.out.println("Error: " + e.toString());
         }
     }
     public static void ScheduleGenerator(){
-        String DB_URL="jdbc:mysql://localhost:3306";
         try {
-            Connection conn = DriverManager.getConnection(DB_URL,"root","123456");
-            Statement stat = conn.createStatement();
-            stat.executeQuery("USE Ticket");
             ResultSet rs = stat.executeQuery("select city from City");
             JSONArray cities=new JSONArray();
             while (rs.next()){
@@ -63,14 +83,14 @@ public class DataGenerator extends Driver {
             int baseCost=3000,addOnPerLeg=500;
             for(int i=0;i< cities.length();i++){
                 // for 20 stations
-                for(int j=0;j<20;j++) {
+                for(int j=0;j<100;j++) {
                     // select dest city
                     int destCity = r.nextInt(cities.length());
                     while (destCity == i) {
                         destCity = r.nextInt(cities.length());
                     }
                     // get random leg
-                    int addLeg=r.nextInt(3);
+                    int addLeg=r.nextInt(5);
                     //get duration
                     String duration=String.valueOf(300+30*addLeg);
                     // get time
@@ -88,9 +108,7 @@ public class DataGenerator extends Driver {
     public static void DealGenerator(){
         String DB_URL="jdbc:mysql://localhost:3306";
         try {
-            Connection conn = DriverManager.getConnection(DB_URL,"root","123456");
-            Statement stat = conn.createStatement();
-            stat.executeQuery("USE Ticket");
+
             Random r= new Random();
             ResultSet rs = stat.executeQuery("select * from Schedule order by RAND() limit 20;");
             // for each of 20 schedules get random max cashback and max percoff
@@ -117,9 +135,5 @@ public class DataGenerator extends Driver {
             System.err.println(e.toString());
         }
     }
-    public static void main(String[] args) {
-        DataGenerator.CityGenerator();
-        DataGenerator.ScheduleGenerator();
-        DataGenerator.DealGenerator();
-    }
+
 }

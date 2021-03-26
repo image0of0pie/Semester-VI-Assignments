@@ -1,7 +1,5 @@
 package Models;
-
 import org.json.JSONArray;
-import org.json.JSONObject;
 import javax.servlet.http.HttpServletRequest;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -13,6 +11,7 @@ public class QueryManager {
     public Statement stat;
     public HttpServletRequest req;
     public List<Schedule> scheduleList;
+    public List<Integer> dealScheduleIdList;
     public QueryManager(Statement stat, HttpServletRequest req){
         this.stat=stat;
         this.req=req;
@@ -27,18 +26,24 @@ public class QueryManager {
         }catch (Exception e){
             System.out.println(e.toString());
         }
+        try{
+            ResultSet rs= stat.executeQuery("select scheduleId from Deals");
+            while(rs.next()){
+                dealScheduleIdList.add(rs.getInt("scheduleId"));
+            }
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
     }
     public JSONArray getQueryResult() throws SQLException {
         JSONArray ans=new JSONArray();
         for(Schedule schedule:this.scheduleList){
-            ResultSet checkRes= stat.executeQuery("select * from Deals where scheduleId = "+schedule.getId());
-            if(!checkRes.next()){
-                schedule.setOnSale("");
-            }else{
+            if(dealScheduleIdList.contains(schedule.getId())){
                 schedule.setOnSale("On Sale");
+            }else{
+                schedule.setOnSale("");
             }
-            JSONObject schedulee=schedule.toJSON();
-            ans.put(schedulee);
+            ans.put(schedule.toJSON());
         }
         return ans;
     }
@@ -46,11 +51,13 @@ public class QueryManager {
         String arrivalCity=req.getAttribute("arrivalCity").toString();
         String departureCity=req.getAttribute("departureCity").toString();
         String time=req.getAttribute("time").toString();
+        Integer start=(Integer) req.getAttribute("start");
+        Integer count=(Integer) req.getAttribute("count");
         String query="select * from Schedule ";
         boolean searchParam=false;
         if(!arrivalCity.equals("")){
             searchParam=true;
-            query=query+" WHERE arrivalCity REGEXP '"+arrivalCity+"+' ";
+            query=query+" WHERE arrivalCity REGEXP '"+arrivalCity+"' ";
         }
         if(!departureCity.equals("")){
             if(searchParam){
@@ -58,7 +65,7 @@ public class QueryManager {
             }else{
                 query=query+" WHERE ";
             }
-            query=query+" departureCity REGEXP '"+departureCity+"+' ";
+            query=query+" departureCity REGEXP '"+departureCity+"' ";
             searchParam=true;
         }
         if(!time.equals("")){
@@ -67,9 +74,9 @@ public class QueryManager {
             }else{
                 query=query+" WHERE ";
             }
-            query=query+"time = '"+time+"'";
-            searchParam=true;
+            query=query+"time = '"+time+"' ";
         }
+        query=query+" limit "+start+" , "+count+" ;";
         return query;
     }
 }
