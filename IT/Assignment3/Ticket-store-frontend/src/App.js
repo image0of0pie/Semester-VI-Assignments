@@ -13,6 +13,8 @@ import MenuItem from "@material-ui/core/MenuItem";
 import FormControl from "@material-ui/core/FormControl";
 import Select from "@material-ui/core/Select";
 import Carousal from "./Carousal";
+import Downshift from "downshift";
+
 const useStyles = makeStyles((theme) => ({
   formControl: {
     margin: theme.spacing(1),
@@ -40,13 +42,13 @@ const useStyles = makeStyles((theme) => ({
     width: 200,
   },
 }));
-function loadServerRows(page, data) {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve(data.slice(page * 10, (page + 1) * 10));
-    }, Math.random() * 500 + 100); // simulate network latency
-  });
-}
+// function loadServerRows(page, data) {
+//   return new Promise((resolve) => {
+//     setTimeout(() => {
+//       resolve(data.slice(page * 10, (page + 1) * 10));
+//     }, Math.random() * 500 + 100); // simulate network latency
+//   });
+// }
 function formatParams(params) {
   return (
     "?" +
@@ -61,20 +63,21 @@ export default function DenseAppBar() {
   const classes = useStyles();
   const [page, setPage] = React.useState(0);
   const [rows, setRows] = React.useState([]);
-  const [data, setData] = React.useState([]);
   const columns = [
     { field: "id", hide: true, headerName: "ID" },
     { field: "time", width: 90, headerName: "Time" },
-    { field: "arrivalCity", width: 210, headerName: "Arrival City/Airport" },
+    { field: "arrivalCity", width: 190, headerName: "Arrival City/Airport" },
     {
       field: "departureCity",
-      width: 210,
+      width: 190,
       headerName: "Departure City/Airport",
     },
     { field: "legs", width: 90, headerName: "Legs" },
-    { field: "cost", width: 150, headerName: "Total Cost (in ₹)" },
-    { field: "duration", width: 150, headerName: "Duration(mins)" },
+    { field: "cost", width: 120, headerName: "Total Cost (in ₹)" },
+    { field: "duration", width: 120, headerName: "Duration(mins)" },
+    { field: "sale", width: 120, headerName: "On Sale" },
   ];
+
   const timeList = [
     "0:00",
     "0:30",
@@ -129,41 +132,21 @@ export default function DenseAppBar() {
   const [searchArrivalCity, setSearchArrivalCity] = React.useState("");
   const [searchDepartureCity, setSearchDepartureCity] = React.useState("");
   const [searchTime, setSearchTime] = React.useState("");
-  const handlePageChange = (params) => {
-    setPage(params.page);
-  };
-
-  React.useEffect(() => {
+  const handlePageChange = (param) => {
+    setPage(param.page);
     let active = true;
-
-    (async () => {
-      setLoading(true);
-      const newRows = await loadServerRows(page, data);
-
-      if (!active) {
-        return;
-      }
-
-      setRows(newRows);
-      setLoading(false);
-    })();
-
-    return () => {
-      active = false;
-    };
-  }, [page, data]);
-
-  const [cities, setCities] = React.useState([]);
-  const handleSearchQuery = () => {
     const params = {
       arrivalCity: searchArrivalCity,
       departureCity: searchDepartureCity,
       time: searchTime,
+      start: page * 10,
+      count: 10,
     };
     const url =
       "http://localhost:8080/Assignment3_war/queryflight" +
       formatParams(params);
     (async () => {
+      setLoading(true);
       await fetch(url)
         .then((response) => response.json())
         .then((res) => {
@@ -171,10 +154,18 @@ export default function DenseAppBar() {
             if (a.time > b.time) return 1;
             else return -1;
           });
-          setData(res);
+          setRows(res);
         })
         .catch((err) => console.log(err));
+      if (!active) {
+        return;
+      }
+      setLoading(false);
     })();
+  };
+  const [cities, setCities] = React.useState([]);
+  const handleSearchQuery = () => {
+    handlePageChange({ page: 0 });
   };
   React.useEffect(() => {
     (async () => {
@@ -194,28 +185,7 @@ export default function DenseAppBar() {
         .catch((err) => console.log(err));
     })();
   });
-  React.useEffect(() => {
-    const params = {
-      arrivalCity: searchArrivalCity,
-      departureCity: searchDepartureCity,
-      time: searchTime,
-    };
-    const url =
-      "http://localhost:8080/Assignment3_war/queryflight" +
-      formatParams(params);
-    (async () => {
-      await fetch(url)
-        .then((response) => response.json())
-        .then((res) => {
-          res.sort(function (a, b) {
-            if (a.time > b.time) return 1;
-            else return -1;
-          });
-          setData(res);
-        })
-        .catch((err) => console.log(err));
-    })();
-  });
+
   return (
     <div className={classes.root}>
       <Grid container>
@@ -232,45 +202,113 @@ export default function DenseAppBar() {
         <Grid item xs={12} sm={12} lg={8}>
           <Paper className={classes.paper}>
             <Grid item xs={12} style={{ marginTop: 10 }}>
-              <FormControl className={classes.formControl}>
-                <InputLabel id="demo-simple-select-filled-label">
-                  Departure City
-                </InputLabel>
-                <Select
-                  labelId="demo-simple-select-filled-label"
-                  id="demo-simple-select-filled"
-                  value={searchDepartureCity}
-                  onChange={(event) =>
-                    setSearchDepartureCity(event.target.value)
-                  }
-                >
-                  <MenuItem value="">
-                    <em>All</em>
-                  </MenuItem>
-                  {cities.map((city) => (
-                    <MenuItem value={city.city}>{city.city}</MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-              <FormControl className={classes.formControl}>
-                <InputLabel id="demo-simple-select-filled-label">
-                  Arrival City
-                </InputLabel>
-                <Select
-                  labelId="demo-simple-select-filled-label"
-                  id="demo-simple-select-filled"
-                  value={searchArrivalCity}
-                  onChange={(event) => setSearchArrivalCity(event.target.value)}
-                >
-                  <MenuItem value="">
-                    <em>All</em>
-                  </MenuItem>
-                  {cities.map((city) => (
-                    <MenuItem value={city.city}>{city.city}</MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-
+              <Downshift
+                onChange={(selection) => setSearchArrivalCity(selection.city)}
+                itemToString={(item) => (item ? item.city : "")}
+              >
+                {({
+                  getInputProps,
+                  getItemProps,
+                  getMenuProps,
+                  isOpen,
+                  inputValue,
+                  highlightedIndex,
+                  selectedItem,
+                  getRootProps,
+                }) => (
+                  <div>
+                    <div {...getRootProps({}, { suppressRefError: true })}>
+                      <input
+                        style={{ minHeight: 40 }}
+                        placeholder="Enter Arrival City"
+                        {...getInputProps()}
+                      />
+                    </div>
+                    <ul {...getMenuProps()} style={{ display: "block" }}>
+                      {isOpen
+                        ? cities
+                            .filter(
+                              (item) =>
+                                !inputValue || item.city.includes(inputValue)
+                            )
+                            .map((item, index) => (
+                              <li
+                                {...getItemProps({
+                                  key: item.city,
+                                  index,
+                                  item,
+                                  style: {
+                                    backgroundColor:
+                                      highlightedIndex === index
+                                        ? "lightgray"
+                                        : "white",
+                                    fontWeight:
+                                      selectedItem === item ? "bold" : "normal",
+                                  },
+                                })}
+                              >
+                                {item.city}
+                              </li>
+                            ))
+                        : null}
+                    </ul>
+                  </div>
+                )}
+              </Downshift>
+              <Downshift
+                onChange={(selection) => setSearchDepartureCity(selection.city)}
+                itemToString={(item) => (item ? item.city : "")}
+              >
+                {({
+                  getInputProps,
+                  getItemProps,
+                  getMenuProps,
+                  isOpen,
+                  inputValue,
+                  highlightedIndex,
+                  selectedItem,
+                  getRootProps,
+                }) => (
+                  <div>
+                    <div {...getRootProps({}, { suppressRefError: true })}>
+                      <input
+                        style={{ minHeight: 40 }}
+                        placeholder="Enter Departure City"
+                        {...getInputProps()}
+                      />
+                    </div>
+                    <ul {...getMenuProps()} style={{ display: "block" }}>
+                      {isOpen
+                        ? cities
+                            .filter(
+                              (item) =>
+                                inputValue !== "" &&
+                                item.city.includes(inputValue)
+                            )
+                            .map((item, index) => (
+                              <li
+                                {...getItemProps({
+                                  key: item.city,
+                                  index,
+                                  item,
+                                  style: {
+                                    backgroundColor:
+                                      highlightedIndex === index
+                                        ? "lightgray"
+                                        : "white",
+                                    fontWeight:
+                                      selectedItem === item ? "bold" : "normal",
+                                  },
+                                })}
+                              >
+                                {item.city}
+                              </li>
+                            ))
+                        : null}
+                    </ul>
+                  </div>
+                )}
+              </Downshift>
               <FormControl className={classes.formControl}>
                 <InputLabel id="demo-simple-select-filled-label">
                   Time
@@ -307,7 +345,7 @@ export default function DenseAppBar() {
                     columns={columns}
                     pagination
                     pageSize={10}
-                    rowCount={data.length}
+                    rowCount={10000}
                     paginationMode="server"
                     onPageChange={handlePageChange}
                     loading={loading}

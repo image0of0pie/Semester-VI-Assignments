@@ -1,0 +1,1 @@
+select dept_code,count(*) as Number_of_Female from assignment.emp where sex='F' group by dept_code;

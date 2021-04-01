@@ -1,0 +1,1 @@
+select dept_code,city,count(*) as City_Wise_Employee from assignment.emp group by city, dept_code order by dept_code;

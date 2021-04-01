@@ -1,0 +1,1 @@
+select * from assignment.emp where basic is null;

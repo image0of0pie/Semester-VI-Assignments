@@ -12,6 +12,10 @@
     <param-value>com.mysql.jdbc.Driver</param-value>
   </context-param>
   <context-param>
+    <param-name>privatekey</param-name>
+    <param-value>KhelaHobe</param-value>
+  </context-param>
+  <context-param>
     <param-name>DB_NAME</param-name>
     <param-value>Ticket</param-value>
   </context-param>

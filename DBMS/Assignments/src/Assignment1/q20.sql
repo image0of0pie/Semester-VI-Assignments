@@ -1,0 +1,1 @@
+select * from assignment.emp order by dept_code,basic desc ;

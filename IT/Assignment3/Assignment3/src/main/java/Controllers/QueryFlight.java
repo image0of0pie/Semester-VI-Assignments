@@ -1,6 +1,5 @@
 package Controllers;
-import Models.QueryManager;
-import javax.servlet.ServletConfig;
+import Models.QueryManagerDao;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -8,6 +7,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
 @WebServlet(urlPatterns = "/queryflight")
@@ -17,7 +17,8 @@ public class QueryFlight extends HttpServlet {
     public void init() throws ServletException {
         super.init();
         try{
-            stat=(Statement) getServletContext().getAttribute("databaseStatement");
+            stat=((Connection) getServletContext().getAttribute("connection")).createStatement();
+            stat.executeQuery("USE TICKET");
         }catch (Exception e) {
             System.err.println(e.toString());
         }
@@ -28,9 +29,9 @@ public class QueryFlight extends HttpServlet {
         PrintWriter out= resp.getWriter();
         String clientOrigin = req.getHeader("origin");
         resp.setHeader("Access-Control-Allow-Origin", clientOrigin);
-        QueryManager queryManager=new QueryManager(stat,req);
+        QueryManagerDao queryManagerDao =new QueryManagerDao(stat,req);
         try {
-            out.println(queryManager.getQueryResult());
+            out.println(queryManagerDao.getQueryResult());
         } catch (SQLException throwables) {
             throwables.printStackTrace();
         }

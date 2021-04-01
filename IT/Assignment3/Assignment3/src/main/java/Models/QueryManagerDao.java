@@ -6,17 +6,17 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
-
-public class QueryManager {
+public class QueryManagerDao {
     public Statement stat;
     public HttpServletRequest req;
     public List<Schedule> scheduleList;
     public List<Integer> dealScheduleIdList;
-    public QueryManager(Statement stat, HttpServletRequest req){
+    public QueryManagerDao(Statement stat, HttpServletRequest req){
         this.stat=stat;
         this.req=req;
         String query=generateQuery();
         this.scheduleList=new ArrayList<>();
+        this.dealScheduleIdList=new ArrayList<>();
         try {
             ResultSet rs = stat.executeQuery(query);
             while (rs.next()){
@@ -57,7 +57,7 @@ public class QueryManager {
         boolean searchParam=false;
         if(!arrivalCity.equals("")){
             searchParam=true;
-            query=query+" WHERE arrivalCity REGEXP '"+arrivalCity+"' ";
+            query=query+" WHERE arrivalCity = '"+arrivalCity+"' ";
         }
         if(!departureCity.equals("")){
             if(searchParam){
@@ -65,7 +65,7 @@ public class QueryManager {
             }else{
                 query=query+" WHERE ";
             }
-            query=query+" departureCity REGEXP '"+departureCity+"' ";
+            query=query+" departureCity = '"+departureCity+"' ";
             searchParam=true;
         }
         if(!time.equals("")){

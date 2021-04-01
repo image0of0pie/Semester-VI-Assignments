@@ -1,0 +1,1 @@
+select count(*) from assignment.emp where sex='F'

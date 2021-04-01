@@ -1,0 +1,1 @@
+update assignment.emp set city=upper(city);

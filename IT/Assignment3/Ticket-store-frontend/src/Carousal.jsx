@@ -12,6 +12,7 @@ import AccordionDetails from "@material-ui/core/AccordionDetails";
 import Typography from "@material-ui/core/Typography";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import { Paper } from "@material-ui/core";
+
 const AutoPlaySwipeableViews = autoPlay(SwipeableViews);
 
 const useStyles = makeStyles((theme) => ({
@@ -44,7 +45,7 @@ function SwipeableTextMobileStepper() {
         })
         .catch((err) => console.log(err));
     })();
-  });
+  }, []);
 
   const handleNext = () => {
     setActiveStep((prevActiveStep) =>
@@ -75,8 +76,8 @@ function SwipeableTextMobileStepper() {
             {deals.map((step, index) => (
               <div
                 style={{
-                  height: 240,
-                  backgroundColor: "white",
+                  height: 260,
+                  backgroundColor: "#eaeaff",
                   flexDirection: "column",
                   width: "100%",
                   flex: 1,
@@ -107,7 +108,11 @@ function SwipeableTextMobileStepper() {
                 >
                   Flat {step.perc}% Off
                   <p style={{ fontSize: 20, color: "blue" }}>
-                    (upto ₹ {step.cash})
+                    Upto ₹ {step.cash}{" "}
+                    <span style={{ fontSize: 14, color: "red" }}>
+                      (Valid Till {step.expiresAt.slice(0, 10)}{" "}
+                      {step.expiresAt.slice(11, 16)})
+                    </span>
                   </p>
                 </div>
               </div>
@@ -156,7 +161,7 @@ function SwipeableTextMobileStepper() {
               <Paper>
                 <div
                   style={{
-                    backgroundColor: "white",
+                    backgroundColor: "#eaeaff",
                     width: "100%",
                     flex: 1,
                     marginTop: 5,
@@ -187,8 +192,12 @@ function SwipeableTextMobileStepper() {
                     }}
                   >
                     Flat {step.perc}% Off
-                    <p style={{ fontSize: 15, color: "blue" }}>
-                      (upto ₹ {step.cash})
+                    <p style={{ fontSize: 20, color: "blue" }}>
+                      Upto ₹ {step.cash}{" "}
+                      <span style={{ fontSize: 14, color: "red" }}>
+                        (Valid Till {step.expiresAt.slice(0, 10)}{" "}
+                        {step.expiresAt.slice(11, 16)})
+                      </span>
                     </p>
                   </div>
                 </div>

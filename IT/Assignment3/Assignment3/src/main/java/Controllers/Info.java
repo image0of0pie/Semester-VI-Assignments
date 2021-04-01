@@ -6,8 +6,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.sql.Connection;
 import java.sql.Statement;
-import Models.CityManager;
+import Models.CityManagerDao;
 @WebServlet(urlPatterns = "/info")
 public class Info extends HttpServlet {
     public static Statement stat;
@@ -15,7 +16,8 @@ public class Info extends HttpServlet {
     public void init() throws ServletException {
         super.init();
         try{
-            stat=(Statement) getServletContext().getAttribute("databaseStatement");
+            stat=((Connection) getServletContext().getAttribute("connection")).createStatement();
+            stat.executeQuery("USE TICKET");
         }catch (Exception e) {
             System.err.println(e.toString());
         }
@@ -27,7 +29,7 @@ public class Info extends HttpServlet {
         PrintWriter out= resp.getWriter();
         String clientOrigin = req.getHeader("origin");
         resp.setHeader("Access-Control-Allow-Origin", clientOrigin);
-        CityManager cityManager=new CityManager(stat);
-        out.println(cityManager.getCities());
+        CityManagerDao cityManagerDao =new CityManagerDao(stat);
+        out.println(cityManagerDao.getCities());
     }
 }

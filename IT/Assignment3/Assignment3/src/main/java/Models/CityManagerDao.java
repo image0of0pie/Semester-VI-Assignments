@@ -8,10 +8,10 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CityManager {
+public class CityManagerDao {
     public Statement stat;
     List<City> citiesList;
-    public CityManager(Statement stat){
+    public CityManagerDao(Statement stat){
         this.stat=stat;
         this.citiesList=new ArrayList<>();
         try {

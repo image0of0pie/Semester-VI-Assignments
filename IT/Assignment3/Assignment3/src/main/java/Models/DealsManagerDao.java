@@ -9,12 +9,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-public class DealsManager {
+public class DealsManagerDao {
     public Statement stat;
     List<Deal> dealsList;
     public void DealGenerator(){
         try {
-            this.stat.executeQuery("USE Ticket");
             this.stat.executeUpdate("delete from Deals");
             Random r= new Random();
             ResultSet rs = stat.executeQuery("select * from Schedule order by RAND() limit 20;");
@@ -42,7 +41,7 @@ public class DealsManager {
             System.err.println(e.toString());
         }
     }
-    public DealsManager(Statement stat){
+    public DealsManagerDao(Statement stat){
         this.stat=stat;
         this.dealsList=new ArrayList<>();
         try {
